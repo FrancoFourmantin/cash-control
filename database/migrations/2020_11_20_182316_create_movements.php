@@ -14,11 +14,15 @@ class CreateMovements extends Migration
     public function up()
     {
         Schema::create('movements', function (Blueprint $table) {
-			$table->uuid('id');
+			$table->uuid('id')->primary()->unique();
 			$table->uuid('user_category_id');
 			$table->uuid('user_id');
 			$table->string('quantity');
-            $table->timestamps();
+			$table->timestamps();
+
+
+			$table->foreign('user_category_id')->references('id')->on('users_categories');
+			$table->foreign('user_id')->references('id')->on('users');
         });
     }
 

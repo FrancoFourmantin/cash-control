@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Ramsey\Uuid\Rfc4122\UuidV4;
 
 class User extends Authenticatable
 {
@@ -16,10 +17,14 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $fillable = [
-        'name',
+	protected $fillable = [
+		'id',
+		'name',
+		'surname',
         'email',
-        'password',
+		'password',
+		'created_at',
+		'updated_at',
     ];
 
     /**
@@ -39,5 +44,10 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-    ];
+	];
+
+	public $incrementing = false;
+	public $keyType = 'string';
+
+
 }

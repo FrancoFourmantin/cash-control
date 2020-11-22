@@ -13,11 +13,15 @@ class CreateTableUserCategory extends Migration
      */
     public function up()
     {
-        Schema::create('user_category', function (Blueprint $table) {
-			$table->uuid('id');
+        Schema::create('users_categories', function (Blueprint $table) {
+			$table->uuid('id')->unique()->primary();
 			$table->uuid('user_id');
 			$table->uuid('category_id');
-            $table->timestamps();
+			$table->timestamps();
+
+
+			$table->foreign('user_id')->references('id')->on('users');
+			$table->foreign('category_id')->references('id')->on('categories');
         });
     }
 
