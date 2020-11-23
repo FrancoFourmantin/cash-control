@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\Category;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Hash;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 
-class UserController extends Controller
+class CategoryController extends Controller
 {
 	public function index()
 	{
-		return User::all();
+		return Category::all();
 	}
 
 	public function create(Request $request)
@@ -27,21 +26,16 @@ class UserController extends Controller
 
 		try{
 
-			$user = new User();
+			$category = new Category();
 
-			$user->fill([
+			$category->fill([
 				'id' => UuidV4::uuid4()->toString(),
 				'name' => $request->name,
-				'surname' => $request->surname,
-				'email' => $request->email,
-				'password' => Hash::make($request->password),
-			]);
+				'description' => $request->surname,
+			])->save();
 
-			$user->slug = $this->getSlug($user);
 
-			$user->save();
-
-			return response(json_encode($user->all()->toArray()), 200);
+			return response(json_encode($category->all()->toArray()), 200);
 
 		}catch (Exception $e){
 
@@ -49,9 +43,9 @@ class UserController extends Controller
 		}
 	}
 
-	public function show($slug)
+	public function show($id)
 	{
-		return User::where('slug' , $slug)->first();
+		return Category::findOrFail($id);
 	}
 
 	public function update(Request $request , $id)
@@ -62,28 +56,25 @@ class UserController extends Controller
 			return response($validator->getMessageBag() , 400);
 		}
 
-		$user = User::where('slug', $id)->firstOrFail();
+		$category = Category::find($id);
 
-		if( ! $user){
-			return response(json_encode("User doesn't exists" , 400));
+		if( ! $category){
+			return response(json_encode("Category doesn't exists" , 400));
 		}
 
 		try{
 
-			$user->update($request->all());
-
-			$user->save;
+			$category->update($request->all());
+			$category->save;
 
 		} catch(Exception $e) {
 			return response(json_encode($e) , 500);
 		}
-
-		return $user;
 	}
 
-	public function destroy($slug)
+	public function destroy( $id)
 	{
-		return User::where('slug', $slug)->firstOrFail()->delete();
+		return Category::destroy($id);
 	}
 
 	public function updateMany(array $ids)
@@ -106,28 +97,19 @@ class UserController extends Controller
 		case "create":
 			$rules = [
 				'name' => ['required','string','max:255'],
-				'surname' => ['required','string','max:255'],
-				'email' => ['required','unique:users' , 'email' ,'max:255'],
-				'password' => ['required' , 'min:8' , 'max:16']
+				'description' => ['required' , 'max:255' ]
 			];
 			break;
 		case "update":
 			$rules = [
 				'name' => ['string','max:255'],
-				'surname' => ['string','max:255'],
-				'email' => ['unique:users' , 'email' ,'max:255'],
-				'password' => ['min:8' , 'max:16']
+				'description' => ['max:255' ]
 			];
 			break;
 		}
 
 
 		return Validator::make($data , $rules);
-	}
-
-	public function getSlug(User $user)
-	{
-		return strtolower($user->name . '-' . $user->surname . '-' . uniqid());
 	}
 
 	//TODO Develop a function to get the errors msg

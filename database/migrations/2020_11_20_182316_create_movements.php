@@ -18,6 +18,7 @@ class CreateMovements extends Migration
 			$table->uuid('user_category_id');
 			$table->uuid('user_id');
 			$table->string('quantity');
+			$table->boolean('isIncome');
 			$table->timestamps();
 
 
